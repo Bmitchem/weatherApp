@@ -2,6 +2,8 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var bower = require('bower');
 var concat = require('gulp-concat');
+var coffee = require('gulp-coffee');
+var coffeeStream = coffee({bare: true});
 var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
@@ -12,6 +14,16 @@ var paths = {
 };
 
 gulp.task('default', ['sass']);
+
+gulp.task('coffee', function() {
+  gulp.src('cs/*.coffee')
+    .pipe(coffee({bare: true}).on('error', gutil.log))
+    .pipe(gulp.dest('www/js/'))
+});
+
+coffeeStream.on('error', function(err) {
+  console.log(err);
+});
 
 gulp.task('sass', function(done) {
   gulp.src('./scss/ionic.app.scss')

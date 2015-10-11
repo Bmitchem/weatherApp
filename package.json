@@ -11,6 +11,10 @@
   },
   "devDependencies": {
     "bower": "^1.3.3",
+    "gulp-bump": "^1.0.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-load-plugins": "^1.0.0-rc.1",
     "gulp-util": "^2.2.14",
     "shelljs": "^0.3.0"
   },
@@ -23,5 +27,19 @@
   ],
   "cordovaPlatforms": [
     "ios"
-  ]
+  ],
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bmitchem/weatherApp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bmitchem/weatherApp/issues"
+  },
+  "homepage": "https://github.com/Bmitchem/weatherApp#readme"
 }
