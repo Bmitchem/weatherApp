@@ -1,24 +1,43 @@
-saveData = (key, value)->
-  window.localStorage['key'] = JSON.stringify(value)
-  return JSON.parse(window.localStorage[key] or '{}')
 
-settings = JSON.parse(window.localStorage.settings || '{}')
-settings = {}
 
 myApp = angular.module('starter.controllers', ['ionic'])
+
+myApp.saveData = (key, value)->
+  window.localStorage[key] = JSON.stringify(value)
+  return JSON.parse(window.localStorage[key] or '{}')
+
+myApp.settings = JSON.parse(window.localStorage.settings || '{}')
 
 myApp.controller 'DashCtrl', ($scope, $ionicLoading) ->
   baseWeatherURL = 'http://api.openweathermap.org/data/2.5/weather'
   $scope.weatherData = JSON.parse(window.localStorage['weatherData'] or '[]')
+  console.log($scope.weatherData)
 
   convertKelvinToFahrenheit = (K) ->
-    return (K-273.15) * 1.8000 + 32.00
+    return Math.floor((K-273.15) * 1.8000 + 32.00)
 
   convertKelvinToCelsius = (K) ->
-    return K - 273.15
+    return Math.floor(K - 273.15)
+
+  saveWeatherData = (data) ->
+    debugger
+    weatherData = JSON.parse(window.localStorage['weatherData'] or '[]')
+    if weatherData.length > 0
+      for datum in weatherData
+        if data.name == datum.name
+          weatherData[datum] = data
+          myApp.saveData('weatherData', weatherData)
+          return $scope.weatherData = weatherData
+
+    weatherData.push(data)
+    myApp.saveData('weatherData', weatherData)
+    $scope.weatherData = weatherData
+
+
+
 
   processWeatherData = (data) ->
-    temperature_mode = settings.fahrenheit || true
+    temperature_mode = myApp.settings.fahrenheit || true
 
     if temperature_mode
       weatherData =
@@ -52,13 +71,9 @@ myApp.controller 'DashCtrl', ($scope, $ionicLoading) ->
         console.log(error)
       success: (data) ->
         $ionicLoading.hide()
-        $scope.weatherData.push(processWeatherData(data))
-        saveData('weatherData', $scope.weatherData)
+        weatherData = processWeatherData(data)
+        $scope.weatherData = saveWeatherData(weatherData)
     )
-
-
-
-  $scope.weatherPoll('22314', 'us')
 
 myApp.controller 'ChatsCtrl', ($scope, Chats) ->
   $scope.chats = Chats.all()
@@ -70,7 +85,7 @@ myApp.controller 'ChatDetailCtrl', ($scope, $stateParams, Chats)->
 
 myApp.controller 'AccountCtrl', ($scope) ->
   $scope.watchCollection 'settings', ->
-    saveData('settings', $scope.settings)
+    myApp.saveData('settings', $scope.settings)
     settings = $scope.settings
     console.log(settings)
 
