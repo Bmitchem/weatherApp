@@ -48,6 +48,7 @@ myApp.controller 'DashCtrl', ($scope, $ionicLoading, $ionicPopup) ->
       name: data.name
       description: data.weather[0].description
       date_time: data.dt * 1000 #angular wants ms dates so lets give it some fucking ms dates
+      original_data: data
     if temperature_mode
       weatherData.temp= convertKelvinToFahrenheit(data.main.temp)
       weatherData.temp_min= convertKelvinToFahrenheit(data.main.temp_min)

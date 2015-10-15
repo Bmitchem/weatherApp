@@ -56,7 +56,8 @@ myApp.controller('DashCtrl', function($scope, $ionicLoading, $ionicPopup) {
       region: region,
       name: data.name,
       description: data.weather[0].description,
-      date_time: data.dt * 1000
+      date_time: data.dt * 1000,
+      original_data: data
     };
     if (temperature_mode) {
       weatherData.temp = convertKelvinToFahrenheit(data.main.temp);
