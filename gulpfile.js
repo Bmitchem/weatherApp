@@ -7,6 +7,8 @@ var coffeeStream = coffee({bare: true});
 var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
+var stripDebug = require('gulp-strip-debug');
+var uglify = require('gulp-uglify');
 var sh = require('shelljs');
 
 var paths = {
@@ -23,6 +25,12 @@ gulp.task('coffee', function() {
 
 coffeeStream.on('error', function(err) {
   console.log(err);
+});
+
+gulp.task('clean', function(){
+  gulp.src(['./www/js/*.js'])
+    .pipe(stripDebug())
+    .pipe(gulp.dest('www/js/'));
 });
 
 gulp.task('sass', function(done) {

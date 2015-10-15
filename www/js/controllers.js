@@ -27,7 +27,7 @@ myApp.controller('DashCtrl', function($scope, $ionicLoading, $ionicPopup) {
     return Math.floor(K - 273.15);
   };
   saveWeatherData = function(data) {
-    debugger;
+    
     var datum, i, len, weatherData;
     weatherData = JSON.parse(window.localStorage['weatherData'] || '[]');
     if (weatherData.length > 0) {
@@ -87,10 +87,10 @@ myApp.controller('DashCtrl', function($scope, $ionicLoading, $ionicPopup) {
       },
       error: function(error) {
         $ionicLoading.hide();
-        return console.log(error);
+        return void 0;
       },
       success: function(data) {
-        debugger;
+        
         var weatherData;
         if (data.cod === '404') {
           $scope.cityNotFound(zip);
@@ -109,7 +109,7 @@ myApp.controller('DashCtrl', function($scope, $ionicLoading, $ionicPopup) {
     results = [];
     for (i = 0, len = ref.length; i < len; i++) {
       location = ref[i];
-      console.debug("polling weather data for " + location.zip + ": " + location.region);
+      void 0;
       results.push($scope.weatherPoll(location.zip, location.region));
     }
     return results;
@@ -133,7 +133,7 @@ myApp.controller('AccountCtrl', function($scope) {
     var settings;
     myApp.saveData('settings', $scope.settings);
     settings = $scope.settings;
-    return console.log(settings);
+    return void 0;
   });
   $scope.settings = JSON.parse(window.localStorage['settings'] || '{}');
   if ($scope.settings == null) {
