@@ -41,7 +41,9 @@ gulp.task('sass', function(done) {
 
 gulp.task('watch', function() {
   gulp.watch(paths.sass, ['sass']);
+  gulp.watch('cs/*.coffee', ['coffee']);
 });
+
 
 gulp.task('install', ['git-check'], function() {
   return bower.commands.install()

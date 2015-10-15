@@ -3,7 +3,14 @@
     <div id="weather-cards">
       <div class="list card" ng-repeat="data in weatherData">
         <div class="item item-divider">
-          Weather Data for {{ data.name }}
+          <div class="row">
+            <div class="col col-75">
+              Weather Data for {{ data.name }}
+            </div>
+            <div>
+              {{data.date_time | date: 'short'}}
+            </div>
+          </div>
         </div>
         <div class="item item-body" >
           <div class="capitalize">Quick View: {{ data.description }}</div>

@@ -8,10 +8,16 @@ myApp.saveData = (key, value)->
 
 myApp.settings = JSON.parse(window.localStorage.settings || '{}')
 
-myApp.controller 'DashCtrl', ($scope, $ionicLoading) ->
+myApp.controller 'DashCtrl', ($scope, $ionicLoading, $ionicPopup) ->
   baseWeatherURL = 'http://api.openweathermap.org/data/2.5/weather'
-  $scope.weatherData = JSON.parse(window.localStorage['weatherData'] or '[]')
-  console.log($scope.weatherData)
+
+  $scope.cityNotFound = (zip)->
+    alertPopup = $ionicPopup.alert({
+      title: "City not found!",
+      template: "We failed to find a city at #{zip}",
+    })
+    return alertPopup
+
 
   convertKelvinToFahrenheit = (K) ->
     return Math.floor((K-273.15) * 1.8000 + 32.00)
@@ -33,26 +39,23 @@ myApp.controller 'DashCtrl', ($scope, $ionicLoading) ->
     myApp.saveData('weatherData', weatherData)
     $scope.weatherData = weatherData
 
-
-
-
-  processWeatherData = (data) ->
-    temperature_mode = myApp.settings.fahrenheit || true
-
+  processWeatherData = (data, zip, region='us') ->
+    myApp.settings = JSON.parse(window.localStorage.settings || '{}')
+    temperature_mode = myApp.settings.fahrenheit
+    weatherData =
+      zip: zip
+      region: region
+      name: data.name
+      description: data.weather[0].description
+      date_time: data.dt * 1000 #angular wants ms dates so lets give it some fucking ms dates
     if temperature_mode
-      weatherData =
-        name: data.name
-        description: data.weather[0].description
-        temp: convertKelvinToFahrenheit(data.main.temp)
-        temp_min: convertKelvinToFahrenheit(data.main.temp_min)
-        temp_max: convertKelvinToFahrenheit(data.main.temp_max)
+      weatherData.temp= convertKelvinToFahrenheit(data.main.temp)
+      weatherData.temp_min= convertKelvinToFahrenheit(data.main.temp_min)
+      weatherData.temp_max= convertKelvinToFahrenheit(data.main.temp_max)
     else
-      weatherData =
-        name: data.name
-        description: data.weather[0].description
-        temp: convertKelvinToCelsius(data.main.temp)
-        temp_min: convertKelvinToCelsius(data.main.temp_min)
-        temp_max: convertKelvinToCelsius(data.main.temp_max)
+      weatherData.temp= convertKelvinToCelsius(data.main.temp)
+      weatherData.temp_min= convertKelvinToCelsius(data.main.temp_min)
+      weatherData.temp_max= convertKelvinToCelsius(data.main.temp_max)
     return weatherData
 
   $scope.weatherPoll = (zip, region = 'us') ->
@@ -70,10 +73,22 @@ myApp.controller 'DashCtrl', ($scope, $ionicLoading) ->
         $ionicLoading.hide()
         console.log(error)
       success: (data) ->
+        debugger
+        if data.cod == '404'
+          $scope.cityNotFound(zip)
+        else
+          weatherData = processWeatherData(data, zip, region)
+          $scope.weatherData = saveWeatherData(weatherData)
         $ionicLoading.hide()
-        weatherData = processWeatherData(data)
-        $scope.weatherData = saveWeatherData(weatherData)
     )
+
+  $scope.initializeDash = ->
+    $scope.weatherData = JSON.parse(window.localStorage['weatherData'] or '[]')
+    for location in $scope.weatherData
+      console.debug "polling weather data for #{location.zip}: #{location.region}"
+      $scope.weatherPoll(location.zip, location.region)
+
+  $scope.initializeDash()
 
 myApp.controller 'ChatsCtrl', ($scope, Chats) ->
   $scope.chats = Chats.all()
@@ -84,7 +99,7 @@ myApp.controller 'ChatDetailCtrl', ($scope, $stateParams, Chats)->
   $scope.chat = Chats.get($stateParams.chatId)
 
 myApp.controller 'AccountCtrl', ($scope) ->
-  $scope.watchCollection 'settings', ->
+  $scope.$watchCollection 'settings', ->
     myApp.saveData('settings', $scope.settings)
     settings = $scope.settings
     console.log(settings)
